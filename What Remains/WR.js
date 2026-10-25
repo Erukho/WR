@@ -307,6 +307,7 @@ function randomAt(x, y, salt = 0) {
 }
 
 function getTerrain(x, y) {
+  const tile = `${x},${y}`;
   const ground = randomAt(Math.floor(x / 12), Math.floor(y / 12), 10);
   const patch = randomAt(Math.floor(x / 4), Math.floor(y / 4), 20);
   const detail = randomAt(x, y, 30);
