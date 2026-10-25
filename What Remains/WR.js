@@ -160,6 +160,9 @@ let inventorySelection = 0;
 let inventoryScroll = 0;
 const previousKeys = {};
 const harvestedFruit = new Set();
+const usedTiles = new Set();
+let weatherTimer = 0;
+let ashStorm = 0;
 
 function justPressed(key) {
   const pressed = t.isKeyPressed(key);
@@ -307,6 +310,35 @@ function getTerrain(x, y) {
   const ground = randomAt(Math.floor(x / 12), Math.floor(y / 12), 10);
   const patch = randomAt(Math.floor(x / 4), Math.floor(y / 4), 20);
   const detail = randomAt(x, y, 30);
+  if (!usedTiles.has(tile)) {
+    if (randomAt(x, y, 51) > 0.996) {
+      return { type: "mushroom", symbol: "m", color: [160, 90, 190] };
+    }
+    if (randomAt(x, y, 54) > 0.996) {
+      return { type: "bones", symbol: "x", color: [190, 180, 155] };
+    }
+    if (randomAt(x, y, 58) > 0.998) {
+      return { type: "rune", symbol: "♦", color: [155, 100, 230] };
+    }
+    if (randomAt(x, y, 53) > 0.997) {
+      return { type: "well", symbol: "O", color: [120, 130, 145] };
+    }
+    if (randomAt(x, y, 55) > 0.997) {
+      return { type: "ember", symbol: "*", color: [240, 210, 45] };
+    }
+    if (randomAt(x, y, 56) > 0.994) {
+      return { type: "rations", symbol: "&", color: [200, 170, 105] };
+    }
+    if (randomAt(x, y, 52) > 0.997) {
+      return { type: "deadTree", symbol: "T", color: [115, 90, 70] };
+    }
+    if (randomAt(x, y, 57) > 0.994) {
+      return { type: "bandage", symbol: "+", color: [210, 210, 195] };
+    }
+  }
+  if (randomAt(x, y, 60) > 0.099) {
+    return { type: "shrine", symbol: "†", color: [150, 135, 160] };
+  }
   if (ground < 0.72 && patch > 0.45) {
     return {
       type: "rubble",
@@ -417,8 +449,19 @@ t.draw(() => {
     if (t.isKeyPressed("d")) playerX += moveSpeed * dt;
   }
   if (!inventoryOpen && justPressed("f")) {
-    if (!pickUpAshFruit()) {
-      pickUpItem();
+    let found = false;
+    for (let y = Math.floor(playerY) - 1; y <= Math.ceil(playerY) + 1; y++) {
+      for (let x = Math.floor(playerX) - 1; x <= Math.ceil(playerX) + 1; x++) {
+        if (Math.hypot(x - playerX, y - playerY) > 1.5) continue;
+        const tile = `${x},${y}`;
+        if (usedTiles.has(tile)) continue;
+        const type = getTerrain(x, y).type;
+        let item = null;
+        if (type === "mushroom") item = ["Grave Mushroom", 0.2, "m"];
+        if (type === "rations") item = ["Forgotten Rations", 0.5, "&"];
+        if (type === "bandage") item = ["Torn Bandage", 0.2, "+"];
+        if (type === "rune") item = ["Grave Rune", 0.1, "♦"];
+      }
     }
   }
 
